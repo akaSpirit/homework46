@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "bookName": "Anna Karenina",
+    "authorName": "Leo Tolstoy",
+    "bookState": "AVAILABLE",
+    "info": "Anna Karenina tells of the doomed love affair between the sensuous and rebellious Anna and the dashing officer, Count Vronsky.",
+    "employeeID": 999
+  },
+  {
+    "id": 2,
+    "bookName": "War and Peace",
+    "authorName": "Leo Tolstoy",
+    "bookState": "NOT_AVAILABLE",
+    "info": "Epic in scale, War and Peace delineates in graphic detail events leading up to Napoleon's invasion of Russia",
+    "employeeID": 2
+  },
+  {
+    "id": 3,
+    "bookName": "The Great Gatsby",
+    "authorName": "F. Scott Fitzgerald",
+    "bookState": "NOT_AVAILABLE",
+    "info": "The novel chronicles an era that Fitzgerald himself dubbed the \"Jazz Age\".",
+    "employeeID": 1
+  },
+  {
+    "id": 4,
+    "bookName": "Lolita",
+    "authorName": "Vladimir Nabokov",
+    "bookState": "AVAILABLE",
+    "info": "The book is internationally famous for its innovative style and infamous for its controversial subject: the protagonist and unreliable narrator, middle aged Humbert Humbert",
+    "employeeID": 999
+  },
+  {
+    "id": 5,
+    "bookName": "Madame Bovary",
+    "authorName": "Gustave Flaubert",
+    "bookState": "AVAILABLE",
+    "info": "For daring to peer into the heart of an adulteress and enumerate its contents with profound dispassion, the author of Madame Bovary was tried for offenses against morality and religion.",
+    "employeeID": 999
+  }
+]

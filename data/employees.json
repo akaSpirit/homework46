@@ -1,0 +1,42 @@
+[
+  {
+    "empID": 1,
+    "firstName": "Marco",
+    "lastName": "Polo",
+    "readID": [1, 2, 3],
+    "readNowID": [2, 4],
+    "username": "marco",
+    "password": "marco",
+    "email": "marco@gmail.com"
+  },
+  {
+    "empID": 2,
+    "firstName": "Winston",
+    "lastName": "Duarte",
+    "readID": [2],
+    "readNowID": [3],
+    "username": "winston",
+    "password": "winston",
+    "email": "winston@gmail.com"
+  },
+  {
+    "empID": 3,
+    "firstName": "Amos",
+    "lastName": "Burton",
+    "readID": [3],
+    "readNowID": [0],
+    "username": "amos",
+    "password": "amos",
+    "email": "amos@gmail.com"
+  },
+  {
+    "empID": 4,
+    "firstName": "asd",
+    "lastName": "asd",
+    "readID": [3],
+    "readNowID": [0],
+    "username": "asd",
+    "password": "asd",
+    "email": "asd@asd"
+  }
+]
