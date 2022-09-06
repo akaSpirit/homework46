@@ -3,9 +3,10 @@
     "id": 1,
     "bookName": "Anna Karenina",
     "authorName": "Leo Tolstoy",
-    "bookState": "AVAILABLE",
+    "bookState": "NOT_AVAILABLE",
     "info": "Anna Karenina tells of the doomed love affair between the sensuous and rebellious Anna and the dashing officer, Count Vronsky.",
-    "employeeID": 999
+    "currentReaders": ["marco@gmail.com"],
+    "pastReaders": ["winston@gmail.com", "amos@gmail.com", "asd@asd"]
   },
   {
     "id": 2,
@@ -13,7 +14,8 @@
     "authorName": "Leo Tolstoy",
     "bookState": "NOT_AVAILABLE",
     "info": "Epic in scale, War and Peace delineates in graphic detail events leading up to Napoleon's invasion of Russia",
-    "employeeID": 2
+    "currentReaders": ["winston@gmail.com"],
+    "pastReaders": ["amos@gmail.com"]
   },
   {
     "id": 3,
@@ -21,15 +23,17 @@
     "authorName": "F. Scott Fitzgerald",
     "bookState": "NOT_AVAILABLE",
     "info": "The novel chronicles an era that Fitzgerald himself dubbed the \"Jazz Age\".",
-    "employeeID": 1
+    "currentReaders": ["amos@gmail.com"],
+    "pastReaders": ["marco@gmail.com", "asd@asd"]
   },
   {
     "id": 4,
     "bookName": "Lolita",
     "authorName": "Vladimir Nabokov",
-    "bookState": "AVAILABLE",
+    "bookState": "NOT_AVAILABLE",
     "info": "The book is internationally famous for its innovative style and infamous for its controversial subject: the protagonist and unreliable narrator, middle aged Humbert Humbert",
-    "employeeID": 999
+    "currentReaders": ["asd@asd"],
+    "pastReaders": ["marco@gmail.com", "winston@gmail.com"]
   },
   {
     "id": 5,
@@ -37,6 +41,7 @@
     "authorName": "Gustave Flaubert",
     "bookState": "AVAILABLE",
     "info": "For daring to peer into the heart of an adulteress and enumerate its contents with profound dispassion, the author of Madame Bovary was tried for offenses against morality and religion.",
-    "employeeID": 999
+    "currentReaders": [],
+    "pastReaders": []
   }
 ]

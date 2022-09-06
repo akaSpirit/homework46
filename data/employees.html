@@ -20,14 +20,20 @@
             <th scope="col">#</th>
             <th scope="col">firstName</th>
             <th scope="col">lastName</th>
+            <th scope="col">email</th>
+            <th scope="col">прочитано</th>
+            <th scope="col">читает</th>
         </tr>
         </thead>
         <tbody>
-        <#list employees as employee>
+        <#list employees as k, v>
         <tr>
-            <th scope="row">${employee.empID}</th>
-            <td>${employee.firstName!"-- не указано --"}</td>
-            <td>${employee.lastName!"-- не указано --"}</td>
+            <th scope="row">${v?counter}</th>
+            <td>${v.firstName}</td>
+            <td>${v.lastName}</td>
+            <td>${v.email}</td>
+            <td>${v.getReadPastBooks()}</td>
+            <td>${v.getReadNowBooks()}</td>
         </tr>
         </#list>
         </tbody>

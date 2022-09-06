@@ -1,42 +1,38 @@
-[
-  {
-    "empID": 1,
+{
+  "marco@gmail.com": {
     "firstName": "Marco",
     "lastName": "Polo",
-    "readID": [1, 2, 3],
-    "readNowID": [2, 4],
+    "email": "marco@gmail.com",
     "username": "marco",
     "password": "marco",
-    "email": "marco@gmail.com"
+    "readNowID": [1],
+    "readPastID": [3, 4]
   },
-  {
-    "empID": 2,
+  "winston@gmail.com": {
     "firstName": "Winston",
     "lastName": "Duarte",
-    "readID": [2],
-    "readNowID": [3],
+    "email": "winston@gmail.com",
     "username": "winston",
     "password": "winston",
-    "email": "winston@gmail.com"
+    "readNowID": [2],
+    "readPastID": [1, 4]
   },
-  {
-    "empID": 3,
+  "amos@gmail.com": {
     "firstName": "Amos",
     "lastName": "Burton",
-    "readID": [3],
-    "readNowID": [0],
+    "email": "amos@gmail.com",
     "username": "amos",
     "password": "amos",
-    "email": "amos@gmail.com"
+    "readNowID": [3],
+    "readPastID": [1, 2]
   },
-  {
-    "empID": 4,
+  "asd@asd": {
     "firstName": "asd",
     "lastName": "asd",
-    "readID": [3],
-    "readNowID": [0],
+    "email": "asd@asd",
     "username": "asd",
     "password": "asd",
-    "email": "asd@asd"
+    "readNowID": [4],
+    "readPastID": [1, 3]
   }
-]
+}

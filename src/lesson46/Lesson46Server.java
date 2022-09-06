@@ -16,209 +16,181 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Lesson46Server extends BasicServer {
-
     private final static Configuration freemarker = initFreeMarker();
-    private final Map<String, Boolean> boolLogin = new HashMap<>();
-    String id;
-    String email;
+    private final Map<String, Boolean> isLogin = new HashMap<>();
+    private final DataModel dm = new DataModel();
+    private DataModel.Employee enteredEmployee;
 
-    public String getEmail() {
-        return email;
-    }
-
-    String password;
-    String username;
-    String firstname;
-    String lastname;
-    EmployeeModel.Employee emp;
+    private final IdGenerator idGenerator = new IdGenerator();
+    private String id;
 
     public Lesson46Server(String host, int port) throws IOException {
         super(host, port);
-        boolLogin.put("status", true);
+        isLogin.put("status", true);
+
         registerGet("/books", this::bookHandler);
         registerGet("/info", this::infoHandler);
         registerGet("/employees", this::employeesHandler);
         registerGet("/employee", this::employeeHandler);
 
-        registerGet("/cookie", this::cookieHandler);
-        registerGet("/login", e -> {
-            renderTemplate(e, "login.html", boolLogin);
-        });
-//        registerGet("/login", this::loginGet);
-        registerPost("/login", this::loginPost);
         registerGet("/register", this::registerFormGet);
         registerPost("/register", this::registerFormPost);
+
+        registerGet("/login", e -> {
+            renderTemplate(e, "login.html", isLogin);
+        });
+        registerPost("/login", this::loginPost);
+
         registerGet("/profile", this::profileGet);
+//        registerGet("/cookie", this::cookieHandler);
     }
 
-    public EmployeeModel.Employee getEmp() {
-        return emp;
+    private void bookHandler(HttpExchange exchange) {
+
+        renderTemplate(exchange, "books.html", new DataModel());
     }
 
-    private void cookieHandler(HttpExchange exchange) {
-        Cookie sessionCookie = Cookie.make("userId", "123");
-        exchange.getResponseHeaders().add("Set-Cookie", sessionCookie.toString());
-
-        Map<String, Object> data = new HashMap<>();
-        String name = "times";
-
-
-        Cookie c1 = Cookie.make("user%Id", "456");
-        setCookie(exchange, c1);
-
-        Cookie c2 = Cookie.make("user-mail", "example@mail");
-        setCookie(exchange, c2);
-
-        Cookie c3 = Cookie.make("restricted()<>@,;:\\\"/[]?={}", "()<>@,;:\\\"/[]?={}");
-        setCookie(exchange, c3);
-
-        String cookieString = getCookie(exchange);
-        Map<String, String> cookies = Cookie.parse(cookieString);
-        String cookieValue = cookies.getOrDefault(name, "0");
-        int times = Integer.parseInt(cookieValue) + 1;
-
-        Cookie c4 = new Cookie(name, times);
-        setCookie(exchange, c4);
-        data.put(name, times);
-        data.put("cookies", cookies);
-
-        renderTemplate(exchange, "cookie.html", data);
+    private void infoHandler(HttpExchange exchange) {
+        renderTemplate(exchange, "info.html", new DataModel());
     }
-
-//    public void loginGet(HttpExchange exchange) {
-//        Path path = makeFilePath("login.html");
-//        sendFile(exchange, path, ContentType.TEXT_HTML);
-//    }
 
     public void loginPost(HttpExchange exchange) {
         String raw = getBody(exchange);
         Map<String, String> map = Utils.parseUrlEncoded(raw, "&");
-        email = map.get("email");
-        password = map.get("password");
+        String email = map.get("email");
+        String password = map.get("password");
 
-        var users = UserFileService.readJson();
-        emp = new EmployeeModel.Employee(users.size(), firstname, lastname, username, password);
+        if (dm.getEmployees().containsKey(email)) {
+            if (dm.getEmployees().get(email).getPassword().equals(password)) {
+                enteredEmployee = dm.getEmployees().get(email);
 
-        if (users.containsKey(email)) {
-            if (users.get(email).getPassword().equals(password)) {
-//                profileGetData(exchange);
+                id = idGenerator.makeCode("User" + enteredEmployee.getEmail());
+
+                Map<String, Object> data = new HashMap<>();
+                Cookie sessionCookieLogin = Cookie.make(email, id);
+                sessionCookieLogin.setMaxAge(600);
+                sessionCookieLogin.setHttpOnly(true);
+                exchange.getResponseHeaders().add("Set-Cookie", sessionCookieLogin.toString());
+
+                setCookie(exchange, sessionCookieLogin);
+
+                Map<String, String> cookies = Cookie.parse(sessionCookieLogin.toString());
+
+//                String cookieString = getCookie(exchange);
+//                Map<String, String> cookies = Cookie.parse(cookieString);
+//                String cookieValue = cookies.getOrDefault(email, "0");
+//                data.put("cookies", cookies);
+//                renderTemplate(exchange, "cookie.html", data);
+
                 redirect303(exchange, "/profile");
-//                empl = new EmployeeModel.Employee(users.size() + 1, firstname, lastname, username, password);
-            }
-        }else {
-//                empl = null;
-                boolLogin.put("status", false);
+            } else {
+                enteredEmployee = null;
+                isLogin.put("status", false);
                 redirect303(exchange, "/login");
             }
-        }
-
-        public void registerFormGet (HttpExchange exchange){
-            Path path = makeFilePath("register.html");
-            sendFile(exchange, path, ContentType.TEXT_HTML);
-        }
-
-        public void registerFormPost (HttpExchange exchange){
-            String raw = getBody(exchange);
-
-            var users = UserFileService.readJson();
-
-            Map<String, String> parsed = Utils.parseUrlEncoded(raw, "&");
-
-            email = parsed.get("email");
-            password = parsed.get("password");
-            username = parsed.get("username");
-            firstname = parsed.get("firstname");
-            lastname = parsed.get("lastname");
-
-            if (users.containsKey(email)) {
-                String str = "Данный email уже используется";
-                try {
-                    sendByteData(exchange, ResponseCodes.ALREADY_EXISTS, ContentType.TEXT_PLAIN, str.getBytes());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return;
-            }
-            users.put(email, new EmployeeModel.Employee(users.size() + 1, firstname, lastname, username, password));
-            id = String.format("%s", users.size() + 1);
-            UserFileService.writeJson(users);
-
+        } else {
+            enteredEmployee = null;
+            isLogin.put("status", false);
             redirect303(exchange, "/login");
         }
-
-        public void profileGetData (HttpExchange exchange){
-            renderTemplate(exchange, "profile.html", new EmployeeModel());
-        }
-
-        public void profileGet (HttpExchange exchange){
-            Path path = makeFilePath("emptyprofile.html"); //emptyprofile
-            sendFile(exchange, path, ContentType.TEXT_HTML);
-        }
-
-
-        private static Configuration initFreeMarker () {
-            try {
-                Configuration cfg = new Configuration(Configuration.VERSION_2_3_29);
-                // путь к каталогу в котором у нас хранятся шаблоны
-                // это может быть совершенно другой путь, чем тот, откуда сервер берёт файлы
-                // которые отправляет пользователю
-                cfg.setDirectoryForTemplateLoading(new File("data"));
-
-                // прочие стандартные настройки о них читать тут
-                // https://freemarker.apache.org/docs/pgui_quickstart_createconfiguration.html
-                cfg.setDefaultEncoding("UTF-8");
-                cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
-                cfg.setLogTemplateExceptions(false);
-                cfg.setWrapUncheckedExceptions(true);
-                cfg.setFallbackOnNullLoopVariable(false);
-                return cfg;
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        private void bookHandler (HttpExchange exchange){
-            renderTemplate(exchange, "books.html", new BookModel());
-        }
-        private void infoHandler (HttpExchange exchange){
-            renderTemplate(exchange, "info.html", new BookModel());
-        }
-        private void employeesHandler (HttpExchange exchange){
-            renderTemplate(exchange, "employees.html", new EmployeeModel());
-        }
-        private void employeeHandler (HttpExchange exchange){
-            renderTemplate(exchange, "employee.html", new EmployeeModel());
-        }
-
-        protected void renderTemplate(HttpExchange exchange, String templateFile, Object dataModel){
-            try {
-                // загружаем шаблон из файла по имени.
-                // шаблон должен находится по пути, указанном в конфигурации
-                Template temp = freemarker.getTemplate(templateFile);
-
-                // freemarker записывает преобразованный шаблон в объект класса writer
-                // а наш сервер отправляет клиенту массивы байт
-                // по этому нам надо сделать "мост" между этими двумя системами
-
-                // создаём поток который сохраняет всё, что в него будет записано в байтовый массив
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                // создаём объект, который умеет писать в поток и который подходит для freemarker
-                try (OutputStreamWriter writer = new OutputStreamWriter(stream)) {
-
-                    // обрабатываем шаблон заполняя его данными из модели
-                    // и записываем результат в объект "записи"
-                    temp.process(dataModel, writer);
-                    writer.flush();
-
-                    // получаем байтовый поток
-                    var data = stream.toByteArray();
-
-                    // отправляем результат клиенту
-                    sendByteData(exchange, ResponseCodes.OK, ContentType.TEXT_HTML, data);
-                }
-            } catch (IOException | TemplateException e) {
-                e.printStackTrace();
-            }
-        }
-
     }
+
+    private void employeesHandler(HttpExchange exchange) {
+        renderTemplate(exchange, "employees.html", new DataModel());
+    }
+
+    private void employeeHandler(HttpExchange exchange) {
+        renderTemplate(exchange, "employee.html", enteredEmployee);
+    }
+
+    public void registerFormGet(HttpExchange exchange) {
+        Path path = makeFilePath("register.html");
+        sendFile(exchange, path, ContentType.TEXT_HTML);
+    }
+
+    public void registerFormPost(HttpExchange exchange) {
+        String raw = getBody(exchange);
+
+        Map<String, String> parsed = Utils.parseUrlEncoded(raw, "&");
+
+        String email = parsed.get("email");
+        String firstname = parsed.get("firstname");
+        String lastname = parsed.get("lastname");
+        String username = parsed.get("username");
+        String password = parsed.get("password");
+
+        if (dm.getEmployees().containsKey(email)) {
+            redirect303(exchange, "/register");
+            return;
+        }
+        dm.getEmployees().put(email, new DataModel.Employee(firstname, lastname, email, username, password));
+        FileService.writeEmployees(dm.getEmployees());
+        redirect303(exchange, "/login");
+    }
+
+    public void profileGet(HttpExchange exchange) {
+        renderTemplate(exchange, "profile.html", enteredEmployee);
+    }
+
+//    private void cookieHandler(HttpExchange exchange) {
+//        Map<String, Object> data = new HashMap<>();
+//
+//        String name = "user-email";
+//        String email = enteredEmployee.getEmail();
+//
+//        Cookie c1 = Cookie.make("user%Id", id);
+//        c1.setHttpOnly(true);
+//        c1.setMaxAge(600);
+//        setCookie(exchange, c1);
+//        data.put("user%Id", id);
+//
+//        Cookie c2 = Cookie.make("user-mail", email);
+//        c2.setHttpOnly(true);
+//        c2.setMaxAge(600);
+//        setCookie(exchange, c2);
+//        data.put("user-email", email);
+//
+//        String cookieString = getCookie(exchange);
+//        Map<String, String> cookies = Cookie.parse(cookieString);
+//        String cookieValue = cookies.getOrDefault(name, "0");
+////        cookies.remove(name, email);
+//
+//        Cookie c3 = new Cookie(name, email);
+//        setCookie(exchange, c3);
+//        data.put(name, email);
+//        data.put("cookies", cookies);
+//
+//        renderTemplate(exchange, "cookie.html", data);
+//    }
+
+    private static Configuration initFreeMarker() {
+        try {
+            Configuration cfg = new Configuration(Configuration.VERSION_2_3_29);
+            cfg.setDirectoryForTemplateLoading(new File("data"));
+            cfg.setDefaultEncoding("UTF-8");
+            cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+            cfg.setLogTemplateExceptions(false);
+            cfg.setWrapUncheckedExceptions(true);
+            cfg.setFallbackOnNullLoopVariable(false);
+            return cfg;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected void renderTemplate(HttpExchange exchange, String templateFile, Object dataModel) {
+        try {
+            Template temp = freemarker.getTemplate(templateFile);
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            try (OutputStreamWriter writer = new OutputStreamWriter(stream)) {
+                temp.process(dataModel, writer);
+                writer.flush();
+                var data = stream.toByteArray();
+                sendByteData(exchange, ResponseCodes.OK, ContentType.TEXT_HTML, data);
+            }
+        } catch (IOException | TemplateException e) {
+            e.printStackTrace();
+        }
+    }
+
+}

@@ -18,7 +18,7 @@ public class Cookie<V> {
     this.name = name.strip();
     this.value = value;
   }
-  
+
   public static <V> Cookie make(String name, V value) {
     return new Cookie<>(name, value);
   }

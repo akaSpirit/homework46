@@ -20,8 +20,8 @@
             <th scope="col">#</th>
             <th scope="col">Book</th>
             <th scope="col">Author</th>
-            <th scope="col">Available</th>
-            <th scope="col">Who took</th>
+            <th scope="col">Book state/Who read</th>
+            <th scope="col">Actions</th>
             <th scope="col">Info</th>
         </tr>
         </thead>
@@ -29,10 +29,15 @@
         <#list books as book>
         <tr>
             <th scope="row">${book.id}</th>
-            <td>${book.bookName!"-- не указано --"}</td>
-            <td>${book.authorName!"-- не указано --"}</td>
+            <td>${book.bookName}</td>
+            <td>${book.authorName}</td>
+            <#if book.bookState == "AVAILABLE">
             <td>${book.bookState}</td>
-            <td>${book.getReader()}</td>
+            <td><button type="submit" class="btn btn-light">Take book</button></td>
+            <#else>
+            <td>${book.getCurrentReader()}</td>
+            <td><button type="submit" class="btn btn-light">Return book</button></td>
+            </#if>
             <td><a href="http://localhost:9889/info" class="btn btn-light">Info</a></td>
         </tr>
         </#list>

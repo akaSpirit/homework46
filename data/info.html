@@ -16,7 +16,7 @@
 <div class="card-group">
     <#list books as book>
     <div class="card">
-        <img src="images/${book.id}.jpg" class="card-img-top" alt="${book.bookName}">
+        <img src="images/${book?counter}.jpg" class="card-img-top" alt="${book.bookName}">
         <div class="card-body">
             <h5 class="card-title">${book.bookName} by ${book.authorName}</h5>
             <p class="card-text">${book.info}</p>

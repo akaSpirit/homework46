@@ -1,6 +1,8 @@
 package lesson46;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,38 +12,47 @@ import java.util.List;
 import java.util.Map;
 
 public class FileService {
-    private List<BookModel.Book> books;
-    private List<EmployeeModel.Employee> employees;
-    private static final Gson gson = new Gson();
-    private FileService(String fileName) {
-        var filePath = Path.of("data", fileName);
-//        Gson gson = new Gson();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Path booksPath = Paths.get("data/books2.json");
+    private static final Path employeesPath = Paths.get("data/employees2.json");
+
+    public static List<DataModel.Book> readBooks() {
+        var type = new TypeToken<List<DataModel.Book>>() {}.getType();
+        String json = "";
         try {
-            books = List.of(gson.fromJson(Files.readString(filePath), BookModel.Book[].class));
-            employees = List.of(gson.fromJson(Files.readString(filePath), EmployeeModel.Employee[].class));
+            json = Files.readString(booksPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return GSON.fromJson(json, type);
+    }
+
+    public static void writeBooks(List<DataModel.Book> emp) {
+        String json = GSON.toJson(emp);
+        try {
+            byte[] arr = json.getBytes();
+            Files.write(booksPath, arr);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static FileService read(String fileName) {
-        var file = new FileService(fileName);
-        return file;
+    public static Map<String, DataModel.Employee> readEmployees() {
+        var type = new TypeToken<Map<String, DataModel.Employee>>() {}.getType();
+        String json = "";
+        try {
+            json = Files.readString(employeesPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return GSON.fromJson(json, type);
     }
 
-    public List<BookModel.Book> getBooks() {
-        return books;
-    }
-
-    public List<EmployeeModel.Employee> getEmployees() {
-        return employees;
-    }
-
-    public static void writeEmployee(List<EmployeeModel.Employee> emp) {
-        String json = gson.toJson(emp);
+    public static void writeEmployees(Map<String, DataModel.Employee> employeeMap) {
+        String json = GSON.toJson(employeeMap);
         try {
             byte[] arr = json.getBytes();
-            Files.write(Paths.get("data/employees.json"), arr);
+            Files.write(employeesPath, arr);
         } catch (IOException e) {
             e.printStackTrace();
         }
