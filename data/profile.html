@@ -80,12 +80,13 @@
     <th scope="col">Читает сейчас</th>
     <th scope="col">Action</th>
 </tr>
-<tr>
+
     <#if email??>
     <td>${getReadNowBooks()}</td>
-    <#if cookies??>
+
+    <form action="/books" method="post">
     <td><button type="submit" class="btn btn-light">Return book</button></td>
-    </#if>
+    </form>
     </#if>
 </tr>
         </tbody>

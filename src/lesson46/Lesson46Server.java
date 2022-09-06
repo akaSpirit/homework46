@@ -23,6 +23,7 @@ public class Lesson46Server extends BasicServer {
 
     private final IdGenerator idGenerator = new IdGenerator();
     private String id;
+    private Map<Cookie, DataModel.Employee> cookieEmployeeMap = new HashMap<>();
 
     public Lesson46Server(String host, int port) throws IOException {
         super(host, port);
@@ -42,11 +43,10 @@ public class Lesson46Server extends BasicServer {
         registerPost("/login", this::loginPost);
 
         registerGet("/profile", this::profileGet);
-//        registerGet("/cookie", this::cookieHandler);
+        registerGet("/cookie", this::cookieHandler);
     }
 
     private void bookHandler(HttpExchange exchange) {
-
         renderTemplate(exchange, "books.html", new DataModel());
     }
 
@@ -66,21 +66,14 @@ public class Lesson46Server extends BasicServer {
 
                 id = idGenerator.makeCode("User" + enteredEmployee.getEmail());
 
-                Map<String, Object> data = new HashMap<>();
+
                 Cookie sessionCookieLogin = Cookie.make(email, id);
                 sessionCookieLogin.setMaxAge(600);
                 sessionCookieLogin.setHttpOnly(true);
                 exchange.getResponseHeaders().add("Set-Cookie", sessionCookieLogin.toString());
-
-                setCookie(exchange, sessionCookieLogin);
-
                 Map<String, String> cookies = Cookie.parse(sessionCookieLogin.toString());
-
-//                String cookieString = getCookie(exchange);
-//                Map<String, String> cookies = Cookie.parse(cookieString);
-//                String cookieValue = cookies.getOrDefault(email, "0");
-//                data.put("cookies", cookies);
-//                renderTemplate(exchange, "cookie.html", data);
+                setCookie(exchange, sessionCookieLogin);
+                cookieEmployeeMap.put(sessionCookieLogin, enteredEmployee);
 
                 redirect303(exchange, "/profile");
             } else {
@@ -132,35 +125,12 @@ public class Lesson46Server extends BasicServer {
         renderTemplate(exchange, "profile.html", enteredEmployee);
     }
 
-//    private void cookieHandler(HttpExchange exchange) {
-//        Map<String, Object> data = new HashMap<>();
+//    public void profilePost(HttpExchange exchange) {
+//        List<DataModel.Book> books = FileService.readBooks();
+//        DataModel.Book deleteBook = books.get(books.size() -1);
+//        books.remove(deleteBook);
 //
-//        String name = "user-email";
-//        String email = enteredEmployee.getEmail();
-//
-//        Cookie c1 = Cookie.make("user%Id", id);
-//        c1.setHttpOnly(true);
-//        c1.setMaxAge(600);
-//        setCookie(exchange, c1);
-//        data.put("user%Id", id);
-//
-//        Cookie c2 = Cookie.make("user-mail", email);
-//        c2.setHttpOnly(true);
-//        c2.setMaxAge(600);
-//        setCookie(exchange, c2);
-//        data.put("user-email", email);
-//
-//        String cookieString = getCookie(exchange);
-//        Map<String, String> cookies = Cookie.parse(cookieString);
-//        String cookieValue = cookies.getOrDefault(name, "0");
-////        cookies.remove(name, email);
-//
-//        Cookie c3 = new Cookie(name, email);
-//        setCookie(exchange, c3);
-//        data.put(name, email);
-//        data.put("cookies", cookies);
-//
-//        renderTemplate(exchange, "cookie.html", data);
+//        redirect303(exchange, "/books");
 //    }
 
     private static Configuration initFreeMarker() {
@@ -191,6 +161,34 @@ public class Lesson46Server extends BasicServer {
         } catch (IOException | TemplateException e) {
             e.printStackTrace();
         }
+    }
+    private void cookieHandler(HttpExchange exchange) {
+        Cookie sessionCookie = Cookie.make("userId", "123");
+        exchange.getResponseHeaders().add("Set-Cookie", sessionCookie.toString());
+
+        Map<String, Object> data = new HashMap<>();
+        String name = "times";
+
+        Cookie c1 = Cookie.make("user%Id", "456");
+        setCookie(exchange, c1);
+
+        Cookie c2 = Cookie.make("user-mail", "example@mail");
+        setCookie(exchange, c2);
+
+        Cookie c3 = Cookie.make("restricted()<>@,;:\\\"/[]?={}", "()<>@,;:\\\"/[]?={}");
+        setCookie(exchange, c3);
+
+        String cookieString = getCookie(exchange);
+        Map<String, String> cookies = Cookie.parse(cookieString);
+        String cookieValue = cookies.getOrDefault(name, "0");
+        int times = Integer.parseInt(cookieValue) + 1;
+
+        Cookie c4 = new Cookie(name, times);
+        setCookie(exchange, c4);
+        data.put(name, times);
+        data.put("cookies", cookies);
+
+        renderTemplate(exchange, "cookie.html", data);
     }
 
 }

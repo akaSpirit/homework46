@@ -120,6 +120,14 @@ public class DataModel {
 
         public int[] getReadPastID() { return readPastID; }
 
+        public void setReadNowID(int[] readNowID) {
+            this.readNowID = readNowID;
+        }
+
+        public void setReadPastID(int[] readPastID) {
+            this.readPastID = readPastID;
+        }
+
         public String getReadNowBooks() {
             List<DataModel.Book> books = FileService.readBooks();
             String fmt = "";
